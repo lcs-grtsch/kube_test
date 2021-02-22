@@ -1,0 +1,4 @@
+zeit.de:
+  base_url: http://www.zeit.de/
+  crawl_url: http://www.zeit.de/news/index?date=
+  timezone: Europe/Berlin
