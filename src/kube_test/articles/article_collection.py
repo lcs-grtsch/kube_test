@@ -9,7 +9,6 @@ class ArticleCollection:
         return len(self._articles)
 
     def __iter__(self):
-        ''' Returns the Iterator object '''
         return ArticleCollectionIterator(self)
 
     def get_all_articles_tups(self):
@@ -24,7 +23,6 @@ class ArticleCollectionIterator:
         self._index = 0
 
     def __next__(self):
-        ''''Returns the next value from team object's lists '''
         if self._index < len(self._article_collection._articles):
             result = self._article_collection._articles[self._index]
             self._index += 1

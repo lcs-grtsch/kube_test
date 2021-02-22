@@ -57,7 +57,7 @@ def scrape():
             fastapi_logger.error(f'sending request to {request_url}')
             response = requests.get(url=request_url)
         except Exception as e:
-            fastapi_logger.error(f'something is went wrong with request: {e}')
+            fastapi_logger.error(f'something went wrong with request: {e}')
 
         try:
             soup = BeautifulSoup(response.content, 'html.parser')
@@ -78,7 +78,7 @@ def scrape():
                     logger.error(article)
                 # TODO store articles somewhere
         except Exception as e:
-            logger.error(f'something is went wrong when extracting articles: {e}')
+            logger.error(f'something went wrong when extracting articles: {e}')
 
     fastapi_logger.error(f'scraped {len(article_collection)} articles')
     os.environ['LAST_RUN'] = str(now)
