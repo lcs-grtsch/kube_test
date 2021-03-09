@@ -10,4 +10,7 @@ ENV CONFIG_PATH="/config"
 ENV LAST_RUN="Not run yet"
 ENV ARTICLES_CRAWLED="0"
 
+# TODO Add ENV VAR for credentials
+
+
 CMD ["python", "kube_test/main.py"]

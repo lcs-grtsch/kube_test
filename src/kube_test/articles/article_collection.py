@@ -14,7 +14,13 @@ class ArticleCollection:
     def get_all_articles_tups(self):
         return [article.return_as_tup() for article in self._articles]
 
-
+    def to_list(self):
+        result = []
+        for article in self._articles:
+            result.append(
+                {u"publish_time": str(article.publish_time), u"headline": article.headline, u"category": article.category}
+            )
+        return result
 class ArticleCollectionIterator:
     def __init__(self, article_collection):
         # Team object reference

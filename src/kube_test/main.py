@@ -12,6 +12,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.logger import logger as fastapi_logger
 from fastapi.responses import JSONResponse
 from fastapi_utils.tasks import repeat_every
+from google.cloud import bigquery
 
 from articles.article import Article
 from articles.article_collection import ArticleCollection
@@ -46,12 +47,12 @@ def scrape():
     tz = pytz.timezone(configs['zeit.de']['timezone'])
     now = datetime.now(tz)
     fastapi_logger.error(f'starting scrape at {now}')
+    article_collection = ArticleCollection()
 
     for day in range(0, 2):
         crawl_date = now - timedelta(days=day)
         crawl_date_str = crawl_date.strftime('%Y-%m-%d')
         request_url = configs['zeit.de']['crawl_url'] + crawl_date_str
-        article_collection = ArticleCollection()
 
         try:
             fastapi_logger.error(f'sending request to {request_url}')
@@ -70,15 +71,29 @@ def scrape():
                 publish_time = tag.find('time', {'class': 'zon-teaser-news__date'}).attrs['datetime']
                 category = tag.find('span', {'class': 'zon-teaser-news__kicker'}).text
                 headline = tag.find('span', {'class': 'zon-teaser-news__title'}).text
-
                 article_collection.add(Article(category=category.strip(),
                                                headline=headline.strip(),
-                                               publish_time=publish_time))
+                                               publish_time=publish_time[:-6]))
                 for article in article_collection:
                     logger.error(article)
-                # TODO store articles somewhere
         except Exception as e:
             logger.error(f'something went wrong when extracting articles: {e}')
+
+    # TODO Add service account key
+    # client = bigquery.Client()
+    #
+    # table_id = f"{configs['zeit.de']['project']}.{configs['zeit.de']['dataset']}.{configs['zeit.de']['table']}"
+    #
+    # rows_to_insert = article_collection.to_list()
+    #
+    # errors = client.insert_rows_json(
+    #     table_id, rows_to_insert, row_ids=[None] * len(rows_to_insert)
+    # )
+    #
+    # if not errors:
+    #     print("New rows have been added.")
+    # else:
+    #     print("Encountered errors while inserting rows: {}".format(errors))
 
     fastapi_logger.error(f'scraped {len(article_collection)} articles')
     os.environ['LAST_RUN'] = str(now)
